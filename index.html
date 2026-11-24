@@ -64,13 +64,16 @@ h1{font-family:Georgia,'Times New Roman',serif;font-weight:500;font-size:clamp(2
 
 <footer class="footer"><strong>Pieri’s Prestigious Homes</strong>Eleganza, competenza e discrezione · Versilia</footer>
 </main>
+
 <script>
 (function(){
-  const button=document.getElementById('save-contact');
-  if(!button) return;
-  button.addEventListener('click',function(event){
+  const button = document.getElementById('save-contact');
+  if (!button) return;
+
+  button.addEventListener('click', async function(event){
     event.preventDefault();
-    const vcard=[
+
+    const vcard = [
       'BEGIN:VCARD',
       'VERSION:3.0',
       'FN:Pieri’s Prestigious Homes',
@@ -80,15 +83,36 @@ h1{font-family:Georgia,'Times New Roman',serif;font-weight:500;font-size:clamp(2
       'URL:https://www.immobiliarepieri.it',
       'NOTE:La tua agenzia immobiliare di riferimento in Versilia',
       'END:VCARD'
-    ].join('\\r\\n');
-    const blob=new Blob([vcard],{type:'text/vcard;charset=utf-8'});
-    const url=URL.createObjectURL(blob);
-    const link=document.createElement('a');
-    link.href=url;link.download='Pieri-Prestigious-Homes.vcf';
-    document.body.appendChild(link);link.click();link.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    ].join('\r\n');
+
+    const file = new File(
+      [vcard],
+      'Pieri-Prestigious-Homes.vcf',
+      { type: 'text/vcard;charset=utf-8' }
+    );
+
+    try {
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({
+          files: [file],
+          title: 'Pieri’s Prestigious Homes',
+          text: 'Salva il nostro contatto in rubrica'
+        });
+      } else {
+        alert('Per salvare il contatto, apri questa pagina direttamente con Safari su iPhone e riprova.');
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        alert('Non è stato possibile condividere il contatto. Riprova aprendo il sito direttamente in Safari.');
+      }
+    }
   });
 })();
 </script>
+
 </body>
 </html>
